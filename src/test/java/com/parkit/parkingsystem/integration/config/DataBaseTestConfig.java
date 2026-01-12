@@ -14,7 +14,7 @@ public class DataBaseTestConfig extends DataBaseConfig {
         logger.info("Create DB connection");
         Class.forName("com.mysql.cj.jdbc.Driver");
         //get credentials from .env
-        String url = dotenv.get("DB_URL");
+        String url = dotenv.get("DB_URL_TEST");
         String user = dotenv.get("DB_USER");
         String password = dotenv.get("DB_PASSWORD");
         return DriverManager.getConnection(url, user, password);
