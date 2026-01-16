@@ -5,13 +5,12 @@ import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
+
+import java.sql.*;
 
 public class TicketDAO {
 
@@ -85,5 +84,26 @@ public class TicketDAO {
             dataBaseConfig.closeConnection(con);
         }
         return false;
+    }
+
+    public int getNbTicket(String vehiculeRegNumber){
+        Connection con = null;
+        int numberOfTickets = 0;
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.CAR_TICKETS);
+            ps.setString(1,vehiculeRegNumber);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                numberOfTickets = rs.getInt("numberOfTickets");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }finally{
+            dataBaseConfig.closeConnection(con);
+        }
+        return numberOfTickets;
     }
 }
