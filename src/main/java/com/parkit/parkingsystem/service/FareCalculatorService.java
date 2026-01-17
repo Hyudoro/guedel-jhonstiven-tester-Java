@@ -8,50 +8,33 @@ public class FareCalculatorService {
     public void calculateFare(Ticket ticket, boolean discount){
 
         if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
-            throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
+            throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime());
         }
-        double reduction = 1;
-        int faskPark = 1;
+
+        double price;
+        double ratePerHour;
+        final double FREE_PARKING_HOURS= 0.5;
+        final double DISCOUNT_RATE = 0.95;
+
         long inMillis = ticket.getInTime().getTime();
         long outMillis = ticket.getOutTime().getTime();
+        final double MS_TO_HOURS = 1.0/(1000 * 60 * 60);
+        double durationInHours = (outMillis - inMillis)* MS_TO_HOURS;
 
-        //TODO: Some tests are failing here. Need to check if this logic is correct
-        double durationInHours = (outMillis - inMillis)/(1000.0*60*60);
-
-        if (durationInHours<0.5){
-            faskPark = 0;}
-        else{
-            faskPark = 1;
+        if (durationInHours<FREE_PARKING_HOURS) { // if the parking time < 30 minutes then its bill's free.
+            durationInHours = 0;
         }
 
-        if (discount){
-           reduction = 0.95;}
-        else{
-            reduction = 1;
+        switch(ticket.getParkingSpot().getParkingType()){
+            case CAR: ratePerHour = Fare.CAR_RATE_PER_HOUR; break;
+            case BIKE: ratePerHour = Fare.BIKE_RATE_PER_HOUR; break;
+            default: throw new IllegalArgumentException("Unknown Parking Type");
         }
 
-        double rawPriceFareCar =
-                ((durationInHours * Fare.CAR_RATE_PER_HOUR)*reduction)*faskPark;
+        price = durationInHours * ratePerHour;
+        if(discount) price *= DISCOUNT_RATE;
+        price = Math.ceil(price*100)/100;
+        ticket.setPrice(price);
 
-        double roundedPriceFareCar =
-                Math.ceil(rawPriceFareCar * 100.00)/100.00;
-
-        double rawPriceFareBike =
-                ((durationInHours * Fare.BIKE_RATE_PER_HOUR)*reduction)*faskPark;
-
-        double roundedPriceFareBike =
-                Math.ceil(rawPriceFareBike * 100.00)/100.00;
-
-        switch (ticket.getParkingSpot().getParkingType()){
-            case CAR: {
-                ticket.setPrice(roundedPriceFareCar);
-                break;
-            }
-            case BIKE: {
-                ticket.setPrice(roundedPriceFareBike);
-                break;
-            }
-            default: throw new IllegalArgumentException("Unkown Parking Type");
-        }
     }
 }
