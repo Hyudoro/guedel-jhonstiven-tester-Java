@@ -32,9 +32,15 @@ public class FareCalculatorService {
         }
 
         price = durationInHours * ratePerHour;
-        if(discount) price *= DISCOUNT_RATE;
+        if(discount) {
+            System.out.println("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%");
+            price *= DISCOUNT_RATE;
+        }
         price = Math.ceil(price*100)/100;
         ticket.setPrice(price);
 
+    }
+    public void calculateFare(Ticket ticket){
+        calculateFare(ticket,false);
     }
 }
