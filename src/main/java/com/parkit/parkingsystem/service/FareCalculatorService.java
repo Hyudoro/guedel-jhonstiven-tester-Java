@@ -13,31 +13,29 @@ public class FareCalculatorService {
 
         double price;
         double ratePerHour;
-        final double FREE_PARKING_HOURS= 0.5;
-        final double DISCOUNT_RATE = 0.95;
-
         long inMillis = ticket.getInTime().getTime();
         long outMillis = ticket.getOutTime().getTime();
-        final double MS_TO_HOURS = 1.0/(1000 * 60 * 60);
-        double durationInHours = (outMillis - inMillis)* MS_TO_HOURS;
+        double durationInHours = (outMillis - inMillis) / 3_600_000.0;
 
-        if (durationInHours<FREE_PARKING_HOURS) { // if the parking time < 30 minutes then its bill's free.
-            durationInHours = 0;
-        }
+       if (durationInHours<0.5) { // if the parking time < 30 minutes then its bill's free.
+           ticket.setPrice(0);
+       }
+       else
+       {
+           switch(ticket.getParkingSpot().getParkingType()){
+               case CAR: ratePerHour = Fare.CAR_RATE_PER_HOUR; break;
+               case BIKE: ratePerHour = Fare.BIKE_RATE_PER_HOUR; break;
+               default: throw new IllegalArgumentException("Unknown Parking Type");
 
-        switch(ticket.getParkingSpot().getParkingType()){
-            case CAR: ratePerHour = Fare.CAR_RATE_PER_HOUR; break;
-            case BIKE: ratePerHour = Fare.BIKE_RATE_PER_HOUR; break;
-            default: throw new IllegalArgumentException("Unknown Parking Type");
-        }
-
-        price = durationInHours * ratePerHour;
-        if(discount) {
-            System.out.println("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%");
-            price *= DISCOUNT_RATE;
-        }
-        price = Math.ceil(price*100)/100;
-        ticket.setPrice(price);
+           }
+           price = durationInHours * ratePerHour;
+           if(discount) {
+               System.out.println("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%");
+               price *= 0.95; // discount
+           }
+           price = Math.ceil(price*100)/100; // round the number. ex : 0.6494 -> 0.65.
+           ticket.setPrice(price);
+       }
 
     }
     public void calculateFare(Ticket ticket){
