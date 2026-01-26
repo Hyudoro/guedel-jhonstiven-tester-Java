@@ -61,7 +61,7 @@ public class ParkingServiceTest {
 
     @Test
     void processExitingVehicleTest(){
-        when(ticketDAO.getNbTicket("ABCDEF")).thenReturn(1);
+        when(ticketDAO.getNbTicket("ABCDEF")).thenReturn(2);
         parkingService.processExitingVehicle();
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
         verify(fareCalculatorService, times(1)).calculateFare(any(Ticket.class), eq(true));
@@ -70,8 +70,8 @@ public class ParkingServiceTest {
     @Test
     void processIncomingVehicleTest(){
         when(inputReaderUtil.readSelection()).thenReturn(1);
-        when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
-        when(ticketDAO.getNbTicket("ABCDEF")).thenReturn(1);
+        when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(2);
+        when(ticketDAO.getNbTicket("ABCDEF")).thenReturn(2);
 
         parkingService.processIncomingVehicle();
 
@@ -86,7 +86,7 @@ public class ParkingServiceTest {
     @Test
     void processExitingVehicleUnableUpdateTest(){
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
-        when(ticketDAO.getNbTicket("ABCDEF")).thenReturn(1);
+        when(ticketDAO.getNbTicket("ABCDEF")).thenReturn(2);
 
         parkingService.processExitingVehicle();
 
@@ -122,16 +122,4 @@ public class ParkingServiceTest {
         ParkingSpot parkingSpot = parkingService.getNextParkingNumberIfAvailable();
         assertNull(parkingSpot, "Error parsing user input for type of vehicle");
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
