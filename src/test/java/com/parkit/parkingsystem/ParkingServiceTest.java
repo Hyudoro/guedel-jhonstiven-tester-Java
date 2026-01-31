@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem;
 
+        import com.parkit.parkingsystem.config.DataBaseConfig;
         import com.parkit.parkingsystem.constants.ParkingType;
         import com.parkit.parkingsystem.dao.ParkingSpotDAO;
         import com.parkit.parkingsystem.dao.TicketDAO;
@@ -18,6 +19,7 @@ package com.parkit.parkingsystem;
         import org.mockito.junit.jupiter.MockitoSettings;
         import org.mockito.quality.Strictness;
 
+        import java.sql.SQLException;
         import java.util.Date;
 
         import static org.junit.jupiter.api.Assertions.*;
@@ -121,5 +123,21 @@ public class ParkingServiceTest {
         when(inputReaderUtil.readSelection()).thenReturn(3);
         ParkingSpot parkingSpot = parkingService.getNextParkingNumberIfAvailable();
         assertNull(parkingSpot, "Error parsing user input for type of vehicle");
+    }
+
+    @Test
+    void saveTicket_dbException_shouldReturnFalse() throws Exception {
+
+        DataBaseConfig mockConfig = mock(DataBaseConfig.class);
+        TicketDAO dao = new TicketDAO();
+        dao.dataBaseConfig = mockConfig;
+
+        when(mockConfig.getConnection()).thenThrow(new SQLException());
+
+        Ticket ticket = new Ticket();
+
+        boolean result = dao.saveTicket(ticket);
+
+        assertFalse(result);
     }
 }

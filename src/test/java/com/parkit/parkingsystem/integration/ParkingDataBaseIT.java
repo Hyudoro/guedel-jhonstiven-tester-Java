@@ -84,17 +84,21 @@ public class ParkingDataBaseIT {
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, fareCalculatorService);
         parkingService.processIncomingVehicle();
         Thread.sleep(500);
+        //Ticket ticket = ticketDAO.getTicket("ABCDEF");
+        //ticket.setInTime(new Date(System.currentTimeMillis() - 3600_000));
+        //ticketDAO.updateTicket(ticket);
         parkingService.processExitingVehicle();
         parkingService.processIncomingVehicle();
         Ticket ticket1 = ticketDAO.getTicket("ABCDEF");
         ticket1.setInTime(new Date(ticket1.getInTime().getTime()-60*60*1000));
         ticketDAO.updateTicket(ticket1);
-        System.out.println(ticket1.getInTime());
         parkingService.processExitingVehicle();
         Ticket ticket2 = ticketDAO.getTicket("ABCDEF");
         double fareAfterDiscount = ticket2.getPrice();
         assertEquals(Math.ceil(0.95*(1* Fare.CAR_RATE_PER_HOUR)*100)/100,fareAfterDiscount);//check if 5% discount was applied.
     }
+
+
 
 
 
